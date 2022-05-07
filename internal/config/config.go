@@ -10,15 +10,16 @@ type Config struct {
 	IsDebug       bool `env:"IS_DEBUG" env-default:"false"`
 	IsDevelopment bool `env:"IS_DEV" env-default:"true"`
 	Listen        struct {
-		Type   string `env:"LISTEN_TYPE" env-default:"port"`
-		BindIP string `env:"BIND_IP" env-default:"0.0.0.0"`
-		Port   string `env:"Port" env-default:"8080"`
+		Type       string `env:"LISTEN_TYPE" env-default:"port" env-description:"port or socket. if socket, then specify SOCKET_FILE is required"`
+		BindIP     string `env:"BIND_IP" env-default:"0.0.0.0"`
+		Port       string `env:"Port" env-default:"8080"`
+		SocketFile string `env:"SOCKET_FILE" env-default:"app.sock"`
 	}
 	AppConfig struct {
-		LogLevel  string
+		LogLevel  string `env:"LOG_LEVEL" env-default:"trace"`
 		AdminUser struct {
-			Email    string `env:"ADMIN_EMAIL" env-required:"true"`
-			Password string `env:"ADMIN_PWD" env-required:"true"`
+			Email    string `env:"ADMIN_EMAIL" env-default:"admin"`
+			Password string `env:"ADMIN_PWD" env-default:"admin"`
 		}
 	}
 }
