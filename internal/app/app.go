@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/Striker87/notes/internal/domain/product/storage"
+	"github.com/Striker87/notes/pkg/client/postgresql"
 	"net"
 	"net/http"
 	"os"
@@ -36,6 +38,20 @@ func NewApp(config *config.Config, logger *logging.Logger) (App, error) {
 	logger.Println("heartbeat metric initializing")
 	metricHandler := metric.Handler{}
 	metricHandler.Register(router)
+
+	pgConfig := postgresql.NewPgConfig(config.PostgreSQL.Username, config.PostgreSQL.Password, config.PostgreSQL.Host, config.PostgreSQL.Port, config.PostgreSQL.Database)
+	pgClient, err := postgresql.NewClient(context.Background(), 5, time.Second*5, pgConfig)
+	if err != nil {
+		logger.Fatal(err)
+	}
+
+	productStorage := storage.NewProductStorage(pgClient, logger)
+	all, err := productStorage.All(context.Background())
+	if err != nil {
+		logger.Fatal(err)
+	}
+	// 53 sec
+	logger.Fatal(all)
 
 	return App{
 		cfg:    config,

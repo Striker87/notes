@@ -6,19 +6,8 @@ import (
 	"log"
 	"time"
 
-	"github.com/jackc/pgconn"
-	"github.com/jackc/pgx"
 	"github.com/jackc/pgx/v4/pgxpool"
 )
-
-type Client interface {
-	Begin(context.Context) (pgx.Tx, error)
-	BeginFunc(ctx context.Context, f func(pgx.Tx) error) error
-	BeginTxFunc(ctx context.Context, txOptions pgx.TxOptions, f func(pgx.Tx) error) error
-	Query(ctx context.Context, sql string, args ...interface{}) (pgx.Rows, error)
-	QueryRow(ctx context.Context, sql string, args ...interface{}) pgx.Row
-	Exec(ctx context.Context, sql string, arguments ...interface{}) (pgconn.CommandTag, error)
-}
 
 type pgConfig struct {
 	Username string
@@ -39,7 +28,6 @@ func NewPgConfig(username string, password string, host string, port string, dat
 	}
 }
 
-// NewClient TODO opensource contributing убрать зависимость от конфига из internal
 func NewClient(ctx context.Context, maxAttempts int, maxDelay time.Duration, cfg *pgConfig) (pool *pgxpool.Pool, err error) {
 	dsn := fmt.Sprintf(
 		"postgresql://%s:%s@%s:%s/%s",
@@ -71,7 +59,6 @@ func NewClient(ctx context.Context, maxAttempts int, maxDelay time.Duration, cfg
 	if err != nil {
 		log.Fatal("All attempts are exceeded. Unable to connect to postgres")
 	}
-
 	return pool, nil
 }
 
@@ -85,9 +72,7 @@ func DoWithAttempts(fn func() error, maxAttempts int, delay time.Duration) error
 
 			continue
 		}
-
 		return nil
 	}
-
 	return err
 }

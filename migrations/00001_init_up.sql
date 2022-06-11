@@ -32,21 +32,19 @@ CREATE TABLE public.product
     description TEXT NOT NULL,
     image_id UUID,
     price BIGINT,
-    currency_id INT,
+    currency_id INT REFERENCES public.currency(id),
     rating INT,
-    category_id INT NOT NULL,
+    category_id INT REFERENCES public.category(id),
     specification JSONB,
     created_at TIMESTAMPTZ,
-   updated_at TIMESTAMPTZ
-);
-
-CREATE TABLE public.product_category_specifications
-(
-      
+    updated_at TIMESTAMPTZ,
+    CONSTRAINT positive_price CHECK (price > 0),
+    CONSTRAINT valid_rating CHECK (rating <= 5)
 );
 
 -- DATA --
 INSERT INTO public.currency (name, symbol) VALUES('рубль', '₽');
 INSERT INTO public.currency (name, symbol) VALUES('dollar', '$');
+INSERT INTO public.category (name) VALUES('купоны'), ('цифровые билеты');
 
 COMMIT;
